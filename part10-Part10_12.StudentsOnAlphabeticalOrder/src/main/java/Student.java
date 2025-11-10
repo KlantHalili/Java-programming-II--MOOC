@@ -1,6 +1,6 @@
 
 
-public class Student {
+public class Student implements Comparable <Student> {
 
     private String name;
 
@@ -16,5 +16,10 @@ public class Student {
     public String toString() {
         return name;
     }
-
+    
+    public int compareTo(Student student){
+        if (this.name.equals(student.name)){
+            return 0;
+        } else return (this.name.compareToIgnoreCase(student.name));
+    }
 }
