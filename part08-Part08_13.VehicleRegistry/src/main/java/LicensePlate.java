@@ -1,5 +1,6 @@
 
 import java.util.Objects;
+import java.util.HashMap;
 
 public class LicensePlate {
     // don't modify existing parts of this class
@@ -22,8 +23,8 @@ public class LicensePlate {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.liNumber);
-        hash = 53 * hash + Objects.hashCode(this.country);
+        hash = 59 * hash + Objects.hashCode(this.liNumber);
+        hash = 59 * hash + Objects.hashCode(this.country);
         return hash;
     }
 
@@ -47,7 +48,6 @@ public class LicensePlate {
         }
         return true;
     }
-    
     
 
 }
