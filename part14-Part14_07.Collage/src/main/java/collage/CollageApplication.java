@@ -1,7 +1,6 @@
 package collage;
 
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,51 +15,48 @@ public class CollageApplication extends Application {
 
     @Override
     public void start(Stage stage) {
-
-        // the example opens the image, creates a new image, and copies the opened image
-        // into the new one, pixel by pixel
         Image sourceImage = new Image("file:monalisa.png");
 
         PixelReader imageReader = sourceImage.getPixelReader();
-
         int width = (int) sourceImage.getWidth();
         int height = (int) sourceImage.getHeight();
 
         WritableImage targetImage = new WritableImage(width, height);
         PixelWriter imageWriter = targetImage.getPixelWriter();
 
-        int yCoordinate = 0;
-        while (yCoordinate < height) {
-            int xCoordinate = 0;
-            while (xCoordinate < width) {
+        for (int y = 0; y < height; y += 2) {
+            for (int x = 0; x < width; x += 2) {
+                Color original = imageReader.getColor(x, y);
 
-                Color color = imageReader.getColor(xCoordinate, yCoordinate);
-                double red = color.getRed();
-                double green = color.getGreen();
-                double blue = color.getBlue();
-                double opacity = color.getOpacity();
+                double red = 1.0 - original.getRed();
+                double green = 1.0 - original.getGreen();
+                double blue = 1.0 - original.getBlue();
+                double opacity = original.getOpacity();
 
-                Color newColor = new Color(red, green, blue, opacity);
+                Color negative = new Color(red, green, blue, opacity);
 
-                imageWriter.setColor(xCoordinate, yCoordinate, newColor);
+                int dx = x / 2;
+                int dy = y / 2;
 
-                xCoordinate++;
+                imageWriter.setColor(dx, dy, negative);
+
+                imageWriter.setColor(dx + width / 2, dy, negative);
+
+                imageWriter.setColor(dx, dy + height / 2, negative);
+
+                imageWriter.setColor(dx + width / 2, dy + height / 2, negative);
             }
-
-            yCoordinate++;
         }
 
-        ImageView image = new ImageView(targetImage);
+        ImageView imageView = new ImageView(targetImage);
+        Pane pane = new Pane(imageView);
+        Scene scene = new Scene(pane);
 
-        Pane pane = new Pane();
-        pane.getChildren().add(image);
-
-        stage.setScene(new Scene(pane));
+        stage.setScene(scene);
         stage.show();
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-
 }
