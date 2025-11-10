@@ -4,6 +4,7 @@ import notifier.NotifierApplication;
 import fi.helsinki.cs.tmc.edutestutils.Points;
 import fi.helsinki.cs.tmc.edutestutils.Reflex;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,11 +14,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import org.testfx.framework.junit.ApplicationTest;
+import org.testfx.util.WaitForAsyncUtils;
 
 @Points("13-06")
 public class NotifierApplicationTest extends ApplicationTest {
@@ -58,9 +57,10 @@ public class NotifierApplicationTest extends ApplicationTest {
     @Test
     public void worksAsExpected() {
         Scene scene = stage.getScene();
-        assertNotNull("The Stage object should have a scene object. Currently the call to getScene of stage returned a null reference after the execution of the start method.", scene);
+        assertNotNull("The Stage object should have a scene object.", scene);
+
         Parent rootOfElements = scene.getRoot();
-        assertNotNull("The Scene object should receive object meant for laying out the user interface components (in this case BorderPane) as its parameter. Currently the Scene object could not find an object containing the components.", rootOfElements);
+        assertNotNull("The Scene object should have a VBox as its root.", rootOfElements);
 
         VBox vbox = null;
         try {
@@ -69,29 +69,44 @@ public class NotifierApplicationTest extends ApplicationTest {
             fail("Make sure you're using the VBox class for laying out user interface components.");
         }
 
-        assertNotNull("The Scene object should receive a VBox object, which is meant for laying out the user interface components, as its parameter.", vbox);
-
-        assertEquals("Expected the user interface to contain three text elements. Not there were: " + vbox.getChildren().size(), 3, vbox.getChildren().size());
+        assertEquals("Expected the user interface to contain three text elements.", 3, vbox.getChildren().size());
 
         Node first = vbox.getChildren().get(0);
         Node second = vbox.getChildren().get(1);
         Node third = vbox.getChildren().get(2);
-        assertTrue("The first element added to VBox should be a TextField object. Now it wasn't. Found: " + first, first.getClass().isAssignableFrom(TextField.class));
-        assertTrue("The second element added to VBox should be a Button object. Now it wasn't. Found: " + second, second.getClass().isAssignableFrom(Button.class));
-        assertTrue("The third element added to VBox should be a Label object. Now it wasn't. Found: " + third, third.getClass().isAssignableFrom(Label.class));
 
-        TextField textField = (TextField) vbox.getChildren().get(0);
-        Button button = (Button) vbox.getChildren().get(1);
-        Label textElement = (Label) vbox.getChildren().get(2);
+        assertTrue("The first element should be a TextField.", first instanceof TextField);
+        assertTrue("The second element should be a Button.", second instanceof Button);
+        assertTrue("The third element should be a Label.", third instanceof Label);
 
-        textField.setText("Hello world!");
+        TextField textField = (TextField) first;
+        Button button = (Button) second;
+        Label label = (Label) third;
+
+        // First test
+        Platform.runLater(() -> textField.setText("Hello world!"));
+        WaitForAsyncUtils.waitForFxEvents();
 
         clickOn(button);
+        WaitForAsyncUtils.waitForFxEvents();
 
-        assertEquals("When the text field has the text \"Hello world!\" and the button is pressed, then the same text should be copied to the text element. Now the textelement contained: " + textElement.getText(), "Hello world!", textElement.getText());
+        final String[] labelText1 = new String[1];
+        Platform.runLater(() -> labelText1[0] = label.getText());
+        WaitForAsyncUtils.waitForFxEvents();
 
-        textField.setText("And other world!");
+        assertEquals("Hello world!", labelText1[0]);
+
+        // Second test
+        Platform.runLater(() -> textField.setText("And other world!"));
+        WaitForAsyncUtils.waitForFxEvents();
+
         clickOn(button);
-        assertEquals("When the text field has the text \"And other world!\" and the button is pressed, then the same text should be copied to the text element. Now the textelement contained: " + textElement.getText(), "And other world!", textElement.getText());
+        WaitForAsyncUtils.waitForFxEvents();
+
+        final String[] labelText2 = new String[1];
+        Platform.runLater(() -> labelText2[0] = label.getText());
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertEquals("And other world!", labelText2[0]);
     }
 }
