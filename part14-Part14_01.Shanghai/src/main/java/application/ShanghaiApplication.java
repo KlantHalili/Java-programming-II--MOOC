@@ -2,30 +2,42 @@ package application;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
 public class ShanghaiApplication extends Application{
-
-    public void start(Stage stage){
-        BorderPane layout = new BorderPane();
-        Label headLabel = new Label();
-        GridPane gridi = new GridPane();
-        for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
-                gridi.add(new Button(), i, j);
-            }
-        }
-        layout.setTop(headLabel);
-        layout.setCenter(gridi);
+    public void start(Stage stage) {
+        NumberAxis xAxis = new NumberAxis(2006, 2018, 2);
+        NumberAxis yAxis = new NumberAxis(0, 100, 10);
         
-        Scene scene = new Scene(layout);
-        stage.setScene(scene);
-        stage.show();
-    }
+        xAxis.setLabel("Year");
+        yAxis.setLabel("Ranking");
+        LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("University of Helsinki, Shanghai ranking");
+        
+        XYChart.Series data = new XYChart.Series();
+        
+        data.getData().add(new XYChart.Data(2007, 73));
+        data.getData().add(new XYChart.Data(2008, 68));
+        data.getData().add(new XYChart.Data(2009, 72));
+        data.getData().add(new XYChart.Data(2010, 72));
+        data.getData().add(new XYChart.Data(2011, 74));
+        data.getData().add(new XYChart.Data(2012, 73));
+        data.getData().add(new XYChart.Data(2013, 76));
+        data.getData().add(new XYChart.Data(2014, 73));
+        data.getData().add(new XYChart.Data(2015, 67));
+        data.getData().add(new XYChart.Data(2016, 56));
+        data.getData().add(new XYChart.Data(2017, 56));
+        
+        lineChart.getData().add(data);
+        
+    Scene view = new Scene(lineChart);
+    stage.setScene(view);
+    stage.show();
+}
+
     public static void main(String[] args) {
         System.out.println("Hello world!");
         launch(ShanghaiApplication.class);
